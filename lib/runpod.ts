@@ -2,6 +2,8 @@ import { RUNPOD_TEMPLATE_ID, POD_CREATE_CONFIG } from "./constants";
 import { GpuOption } from "./types";
 import { proxyFetch } from "./fetch";
 
+const _seenPartialWarnings = new Set<string>();
+
 export async function runpodGraphQL(
   apiKey: string,
   query: string,
@@ -31,7 +33,10 @@ export async function runpodGraphQL(
       console.error("[RunPod GraphQL error]", msg);
       throw new Error(translateRunpodError(msg));
     }
-    console.warn("[RunPod GraphQL partial error]", msg);
+    if (!_seenPartialWarnings.has(msg)) {
+      _seenPartialWarnings.add(msg);
+      console.warn("[RunPod GraphQL partial error]", msg, `(${result.errors.length} occurrence(s), further suppressed)`);
+    }
   }
   return result.data || {};
 }

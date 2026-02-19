@@ -122,8 +122,9 @@ export async function waitForSSH(
     try {
       const result = await sshExec(host, port, "echo SSH_OK", 10000);
       if (result.includes("SSH_OK")) return true;
-    } catch {
-      // not ready yet
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.log(`[waitForSSH] ${host}:${port} attempt failed: ${msg}`);
     }
     await new Promise((r) => setTimeout(r, 10000));
   }
