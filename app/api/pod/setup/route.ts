@@ -113,7 +113,9 @@ export async function POST(req: NextRequest) {
 
         // === Step 2: Wait for SSH ===
         log("Waiting for SSH...");
-        const sshReady = await waitForSSH(sshInfo.host, sshInfo.port, 180000);
+        const sshReady = await waitForSSH(sshInfo.host, sshInfo.port, 180000, (attempt, error) => {
+          log(`SSH not ready (attempt ${attempt}, ${error})`);
+        });
         if (!sshReady) {
           log("ERROR: SSH not available after 3 minutes");
           send("error", { error: "SSH not available. Pod may still be booting." });

@@ -115,16 +115,23 @@ export async function sshExec(
 export async function waitForSSH(
   host: string,
   port: number,
-  timeoutMs: number = 300000
+  timeoutMs: number = 300000,
+  onAttempt?: (attempt: number, error: string) => void
 ): Promise<boolean> {
   const start = Date.now();
+  let attempt = 0;
   while (Date.now() - start < timeoutMs) {
+    attempt++;
     try {
       const result = await sshExec(host, port, "echo SSH_OK", 10000);
       if (result.includes("SSH_OK")) return true;
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
-      console.log(`[waitForSSH] ${host}:${port} attempt failed: ${msg}`);
+      if (onAttempt) {
+        onAttempt(attempt, msg);
+      } else {
+        console.log(`[waitForSSH] ${host}:${port} attempt failed: ${msg}`);
+      }
     }
     await new Promise((r) => setTimeout(r, 10000));
   }

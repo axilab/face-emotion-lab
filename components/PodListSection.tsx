@@ -65,6 +65,10 @@ export function PodListSection() {
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
+      if (data.fallback && data.startedPodId) {
+        setPodId(data.startedPodId);
+        toast.info(`GPU недоступен, запущен fallback-под`);
+      }
       setStartupDialogOpen(true);
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Не удалось запустить под";

@@ -33,9 +33,11 @@ export async function runpodGraphQL(
       console.error("[RunPod GraphQL error]", msg);
       throw new Error(translateRunpodError(msg));
     }
+    // Partial errors are common (e.g. stopped pods missing runtime fields).
+    // Data is usable — log once at debug level only.
     if (!_seenPartialWarnings.has(msg)) {
       _seenPartialWarnings.add(msg);
-      console.warn("[RunPod GraphQL partial error]", msg, `(${result.errors.length} occurrence(s), further suppressed)`);
+      console.debug("[RunPod GraphQL partial]", `${result.errors.length} non-critical error(s), data OK`);
     }
   }
   return result.data || {};
