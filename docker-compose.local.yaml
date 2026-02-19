@@ -1,0 +1,16 @@
+services:
+  face-emotion-lab:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_BASE_PATH: "/face-emotion-lab"
+    env_file:
+      - .env.local
+    ports:
+      - "3000:3000"
+    volumes:
+      - ssh-keys:/app/.tmp/ssh
+    restart: unless-stopped
+
+volumes:
+  ssh-keys:

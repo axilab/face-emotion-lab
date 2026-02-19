@@ -219,6 +219,29 @@ export async function startPodWithFallback(
   );
 }
 
+export async function updatePodEnv(
+  apiKey: string,
+  podId: string,
+  env: Record<string, string>
+) {
+  const res = await proxyFetch(`https://rest.runpod.io/v1/pods/${podId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({ env }),
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`RunPod REST API error: ${res.status} ${text}`);
+  }
+
+  return await res.json();
+}
+
 export async function stopPod(apiKey: string, podId: string) {
   const data = await runpodGraphQL(
     apiKey,
